@@ -1,0 +1,10 @@
+{% if updates %}
+{% for update in updates %}
+<div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #333;">
+    <small class="text-secondary">{{ update.timestamp|date:"M d, Y H:i" }}</small>
+    <p style="margin: 0.2rem 0 0 0;">{{ update.content|linebreaksbr }}</p>
+</div>
+{% endfor %}
+{% else %}
+<p class="text-secondary">No updates logged yet.</p>
+{% endif %}

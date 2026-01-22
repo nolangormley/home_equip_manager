@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Board - Home Equipment Manager{% endblock %}
+
+{% block content %}
+<div class="flex flex-between" style="margin-bottom: 2rem;">
+    <h2>Task Board</h2>
+    <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+
+<div class="kanban-board">
+    <!-- To Do Column -->
+    <div class="kanban-column">
+        <div class="column-header status-todo">
+            <h3>To Do <span class="count">{{ todo_tasks.count }}</span></h3>
+        </div>
+        <div id="list-todo" class="task-list">
+            {% for task in todo_tasks %}
+            {% include 'equipment/partials/kanban_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="kanban-column">
+        <div class="column-header status-in_progress">
+            <h3>In Progress <span class="count">{{ in_progress_tasks.count }}</span></h3>
+        </div>
+        <div id="list-in_progress" class="task-list">
+            {% for task in in_progress_tasks %}
+            {% include 'equipment/partials/kanban_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Done Column -->
+    <div class="kanban-column">
+        <div class="column-header status-done">
+            <h3>Done <span class="count">{{ done_tasks.count }}</span></h3>
+        </div>
+        <div id="list-done" class="task-list">
+            {% for task in done_tasks %}
+            {% include 'equipment/partials/kanban_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .kanban-column {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .column-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        border-radius: 8px 8px 0 0;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .count {
+        background: #333;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+
+    .status-todo {
+        border-top: 3px solid #ff9800;
+    }
+
+    .status-in_progress {
+        border-top: 3px solid #2196f3;
+    }
+
+    .status-done {
+        border-top: 3px solid #4caf50;
+    }
+
+    .task-list {
+        padding: 1rem;
+        flex-grow: 1;
+    }
+
+    .kanban-card {
+        background-color: #2C2C2C;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 0.8rem;
+        cursor: grab;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+
+    .kanban-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-color: #555;
+    }
+
+    .kanban-card:active {
+        cursor: grabbing;
+    }
+
+    .card-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 0.8rem;
+    }
+
+    .equipment-tag {
+        background: #333;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .ghost {
+        opacity: 0.4;
+    }
+
+    .drag {
+        opacity: 0.8;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const columns = ['list-todo', 'list-in_progress', 'list-done'];
+
+        columns.forEach(colId => {
+            new Sortable(document.getElementById(colId), {
+                group: 'kanban',
+                animation: 150,
+                ghostClass: 'ghost',
+                dragClass: 'drag',
+                onEnd: function (evt) {
+                    const itemEl = evt.item;
+                    const newStatus = evt.to.id.replace('list-', '');
+                    const taskId = itemEl.getAttribute('data-task-id');
+                    const csrfToken = '{{ csrf_token }}';
+
+                    // Use HTMX to send the update
+                    htmx.ajax('POST', `/task/${taskId}/status/`, {
+                        target: '#none',
+                        swap: 'none',
+                        values: {
+                            status: newStatus,
+                            csrfmiddlewaretoken: csrfToken
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

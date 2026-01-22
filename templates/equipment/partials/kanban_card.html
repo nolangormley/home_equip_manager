@@ -1,0 +1,20 @@
+<div class="kanban-card" data-task-id="{{ task.pk }}">
+    <div style="font-weight: 500; margin-bottom: 0.5rem;">
+        <a href="{% url 'task_detail' task.pk %}" style="text-decoration: none; color: inherit;">
+            {{ task.title }}
+        </a>
+    </div>
+    {% if task.description %}
+    <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 0.5rem;">
+        {{ task.description|truncatechars:50 }}
+    </div>
+    {% endif %}
+    <div class="card-meta">
+        <span class="equipment-tag">{{ task.equipment.name|truncatechars:15 }}</span>
+        {% if task.due_date %}
+        <span style="{% if task.due_date < today %}color: var(--danger);{% endif %}">
+            {{ task.due_date|date:"M d" }}
+        </span>
+        {% endif %}
+    </div>
+</div>

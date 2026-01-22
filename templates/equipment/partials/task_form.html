@@ -1,0 +1,19 @@
+<form hx-post="{% url 'task_edit' task.pk %}" hx-target="#task-container">
+    {% csrf_token %}
+    <div class="flex flex-between"
+        style="border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+        <h2 style="margin: 0; font-size: 1.5rem;">Edit Task</h2>
+        <div>
+            <button type="button" class="btn" style="background: #444;" hx-get="{% url 'task_detail' task.pk %}"
+                hx-target="#task-container">Cancel</button>
+            <button type="submit" class="btn">Save Changes</button>
+        </div>
+    </div>
+
+    {{ form.as_p }}
+
+</form>
+
+<script>
+    // Re-initialize any JS if needed (none strictly needed for basic forms)
+</script>

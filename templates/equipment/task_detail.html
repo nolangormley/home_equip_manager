@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Task: {{ task.title }} - Home Equipment Manager{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 1rem;">
+        <a href="{% url 'equipment_detail' task.equipment.pk %}" class="text-secondary">&larr; Back to Equipment</a>
+        <span style="margin: 0 0.5rem; color: #444;">|</span>
+        <a href="{% url 'kanban_board' %}" class="text-secondary">Task Board</a>
+    </div>
+
+    <div id="task-container" class="card">
+        {% include 'equipment/partials/task_detail_view.html' %}
+    </div>
+</div>
+{% endblock %}

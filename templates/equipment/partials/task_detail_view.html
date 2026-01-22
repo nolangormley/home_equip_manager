@@ -1,0 +1,40 @@
+<div class="flex flex-between"
+    style="border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+    <h1 style="margin: 0; font-size: 1.5rem;">{{ task.title }}</h1>
+    <div>
+        <button hx-post="{% url 'delete_task' task.pk %}" hx-confirm="Are you sure you want to delete this task?"
+            class="btn" style="background-color: var(--danger); margin-right: 0.5rem;">Delete</button>
+        <button hx-get="{% url 'task_edit' task.pk %}" hx-target="#task-container" class="btn">Edit Task</button>
+    </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div>
+        <label>Status</label>
+        <div style="margin-bottom: 1rem;">
+            <span class="status-badge status-{{ task.status }}">{{ task.get_status_display }}</span>
+        </div>
+
+        <label>Equipment</label>
+        <p style="margin-top: 0;"><a href="{% url 'equipment_detail' task.equipment.pk %}"
+                style="color: var(--text-primary);">{{ task.equipment.name }}</a></p>
+
+        <label>Due Date</label>
+        <p style="margin-top: 0;">{{ task.due_date|default:"No due date" }}</p>
+
+        <label>Completed</label>
+        <p style="margin-top: 0;">{{ task.completed|yesno:"Yes,No" }}</p>
+    </div>
+
+    <div>
+        <label>Description</label>
+        <div style="background: #252525; padding: 1rem; border-radius: 4px; min-height: 100px;">
+            {{ task.description|linebreaks|default:"No description provided." }}
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+            <p>Created: {{ task.created_at }}</p>
+            <p>Last Updated: {{ task.updated_at }}</p>
+        </div>
+    </div>
+</div>
