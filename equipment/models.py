@@ -24,6 +24,7 @@ class Equipment(models.Model):
 
 class Task(models.Model):
     STATUS_CHOICES = [
+        ('icebox', 'Icebox'),
         ('todo', 'To Do'),
         ('in_progress', 'In Progress'),
         ('done', 'Done'),

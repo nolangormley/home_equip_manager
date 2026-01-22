@@ -6,6 +6,9 @@ from .forms import EquipmentForm, TaskForm, UpdateForm, TaskEditForm
 
 # ... imports ...
 
+def landing(request):
+    return render(request, 'landing.html')
+
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if request.headers.get('HX-Request'):
@@ -104,6 +107,7 @@ from django.utils import timezone
 def kanban_board(request):
     tasks = Task.objects.all().select_related('equipment').order_by('due_date')
     return render(request, 'equipment/kanban.html', {
+        'icebox_tasks': tasks.filter(status='icebox'),
         'todo_tasks': tasks.filter(status='todo'),
         'in_progress_tasks': tasks.filter(status='in_progress'),
         'done_tasks': tasks.filter(status='done'),
@@ -116,7 +120,7 @@ def update_task_status(request, pk):
     # Get status from form data or query params
     new_status = request.POST.get('status')
     
-    if new_status in ['todo', 'in_progress', 'done']:
+    if new_status in ['icebox', 'todo', 'in_progress', 'done']:
         task.status = new_status
         task.completed = (new_status == 'done')
         task.save()

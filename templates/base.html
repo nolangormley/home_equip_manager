@@ -30,13 +30,58 @@
             line-height: 1.6;
         }
 
+        .app-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: #1a1a1a;
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            margin-bottom: 2rem;
+        }
+
+        .brand a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: #333;
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
         header {
             background-color: var(--bg-card);
             padding: 1rem 2rem;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         header h1 {
@@ -188,19 +233,31 @@
 </head>
 
 <body>
-    <header>
-        <div>
-            <a href="{% url 'dashboard' %}">
-                <h1>🏠 Home Equipment Manager</h1>
-            </a>
-        </div>
-        <div>
-            <a href="{% url 'kanban_board' %}" class="btn btn-text" style="margin-right: 1rem;">Task Board</a>
-        </div>
-    </header>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <a href="{% url 'landing' %}">
+                    <h1>🏠 HEM</h1>
+                </a>
+            </div>
+            <nav>
+                <a href="{% url 'landing' %}" class="nav-link">Home</a>
+                <a href="{% url 'dashboard' %}" class="nav-link">Equipment</a>
+                <a href="{% url 'kanban_board' %}" class="nav-link">Task Board</a>
+            </nav>
+        </aside>
 
-    <div class="container">
-        {% block content %}{% endblock %}
+        <main class="main-content">
+            <header>
+                <div class="header-content">
+                    <h1>Home Equipment Manager</h1>
+                </div>
+            </header>
+
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
 
     <!-- Initialize HTMX -->

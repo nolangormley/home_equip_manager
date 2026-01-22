@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 2rem;">
+    <h1>Welcome to Home Equipment Manager</h1>
+    <p class="text-secondary" style="font-size: 1.2rem; max-width: 600px; margin: 1rem auto;">
+        Track your equipment, manage maintenance tasks, and stay organized with our
+        Kanban-style workflow.
+    </p>
+
+    <div style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'dashboard' %}" class="btn">View Equipment</a>
+        <a href="{% url 'kanban_board' %}" class="btn" style="background: #333; border: 1px solid #555;">Task Board</a>
+    </div>
+</div>
+{% endblock %}

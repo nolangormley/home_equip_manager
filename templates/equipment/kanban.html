@@ -3,16 +3,27 @@
 {% block title %}Task Board - Home Equipment Manager{% endblock %}
 
 {% block content %}
-<div class="flex flex-between" style="margin-bottom: 2rem;">
+<div style="margin-bottom: 2rem;">
     <h2>Task Board</h2>
-    <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
 </div>
 
 <div class="kanban-board">
+    <!-- Icebox Column -->
+    <div class="kanban-column">
+        <div class="column-header status-icebox">
+            <h3>Icebox <span id="count-icebox" class="count">{{ icebox_tasks.count }}</span></h3>
+        </div>
+        <div id="list-icebox" class="task-list">
+            {% for task in icebox_tasks %}
+            {% include 'equipment/partials/kanban_card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- To Do Column -->
     <div class="kanban-column">
         <div class="column-header status-todo">
-            <h3>To Do <span class="count">{{ todo_tasks.count }}</span></h3>
+            <h3>To Do <span id="count-todo" class="count">{{ todo_tasks.count }}</span></h3>
         </div>
         <div id="list-todo" class="task-list">
             {% for task in todo_tasks %}
@@ -24,7 +35,7 @@
     <!-- In Progress Column -->
     <div class="kanban-column">
         <div class="column-header status-in_progress">
-            <h3>In Progress <span class="count">{{ in_progress_tasks.count }}</span></h3>
+            <h3>In Progress <span id="count-in_progress" class="count">{{ in_progress_tasks.count }}</span></h3>
         </div>
         <div id="list-in_progress" class="task-list">
             {% for task in in_progress_tasks %}
@@ -36,7 +47,7 @@
     <!-- Done Column -->
     <div class="kanban-column">
         <div class="column-header status-done">
-            <h3>Done <span class="count">{{ done_tasks.count }}</span></h3>
+            <h3>Done <span id="count-done" class="count">{{ done_tasks.count }}</span></h3>
         </div>
         <div id="list-done" class="task-list">
             {% for task in done_tasks %}
@@ -49,38 +60,44 @@
 <style>
     .kanban-board {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
         align-items: start;
+        overflow-x: auto;
     }
 
     .kanban-column {
         background-color: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 8px;
-        min-height: 500px;
+        border-radius: 6px;
+        min-height: 400px;
         display: flex;
         flex-direction: column;
+        min-width: 200px;
     }
 
     .column-header {
-        padding: 1rem;
+        padding: 0.8rem;
         border-bottom: 1px solid var(--border);
-        border-radius: 8px 8px 0 0;
+        border-radius: 6px 6px 0 0;
     }
 
     .column-header h3 {
         margin: 0;
-        font-size: 1rem;
+        font-size: 0.9rem;
         display: flex;
         justify-content: space-between;
     }
 
     .count {
         background: #333;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 0.8rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+
+    .status-icebox {
+        border-top: 3px solid #9e9e9e;
     }
 
     .status-todo {
@@ -96,24 +113,25 @@
     }
 
     .task-list {
-        padding: 1rem;
+        padding: 0.5rem;
         flex-grow: 1;
     }
 
     .kanban-card {
         background-color: #2C2C2C;
-        padding: 1rem;
-        border-radius: 6px;
-        margin-bottom: 0.8rem;
+        padding: 0.8rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
         cursor: grab;
         border: 1px solid var(--border);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         transition: all 0.2s;
+        font-size: 0.85rem;
     }
 
     .kanban-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         border-color: #555;
     }
 
@@ -124,15 +142,15 @@
     .card-meta {
         display: flex;
         justify-content: space-between;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: var(--text-secondary);
-        margin-top: 0.8rem;
+        margin-top: 0.5rem;
     }
 
     .equipment-tag {
         background: #333;
-        padding: 2px 6px;
-        border-radius: 4px;
+        padding: 2px 4px;
+        border-radius: 3px;
     }
 
     .ghost {
@@ -147,7 +165,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const columns = ['list-todo', 'list-in_progress', 'list-done'];
+        const columns = ['list-icebox', 'list-todo', 'list-in_progress', 'list-done'];
 
         columns.forEach(colId => {
             new Sortable(document.getElementById(colId), {
@@ -157,7 +175,29 @@
                 dragClass: 'drag',
                 onEnd: function (evt) {
                     const itemEl = evt.item;
-                    const newStatus = evt.to.id.replace('list-', '');
+                    const fromListId = evt.from.id;
+                    const toListId = evt.to.id;
+
+                    // If moved to a different column, update counters
+                    if (fromListId !== toListId) {
+                        const fromStatus = fromListId.replace('list-', '');
+                        const toStatus = toListId.replace('list-', '');
+
+                        const fromCountEl = document.getElementById(`count-${fromStatus}`);
+                        const toCountEl = document.getElementById(`count-${toStatus}`);
+
+                        // Decrement source
+                        if (fromCountEl) {
+                            fromCountEl.textContent = parseInt(fromCountEl.textContent) - 1;
+                        }
+
+                        // Increment destination
+                        if (toCountEl) {
+                            toCountEl.textContent = parseInt(toCountEl.textContent) + 1;
+                        }
+                    }
+
+                    const newStatus = toListId.replace('list-', '');
                     const taskId = itemEl.getAttribute('data-task-id');
                     const csrfToken = '{{ csrf_token }}';
 
