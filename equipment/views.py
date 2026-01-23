@@ -76,6 +76,13 @@ def add_task(request, pk):
     if form.is_valid():
         task = form.save(commit=False)
         task.equipment = equipment
+        # If recurring, set next_due_date to due_date (or today if not set)
+        if task.recurrence:
+            if task.due_date:
+                task.next_due_date = task.due_date
+            else:
+                from django.utils import timezone
+                task.next_due_date = timezone.now().date()
         task.save()
         tasks = equipment.tasks.all().order_by('completed', 'due_date')
         return render(request, 'equipment/partials/task_list.html', {'tasks': tasks, 'equipment': equipment})

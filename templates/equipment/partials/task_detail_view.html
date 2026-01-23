@@ -2,9 +2,11 @@
     style="border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
     <h1 style="margin: 0; font-size: 1.5rem;">{{ task.title }}</h1>
     <div>
+        {% if user.is_authenticated %}
         <button hx-post="{% url 'delete_task' task.pk %}" hx-confirm="Are you sure you want to delete this task?"
             class="btn" style="background-color: var(--danger); margin-right: 0.5rem;">Delete</button>
         <button hx-get="{% url 'task_edit' task.pk %}" hx-target="#task-container" class="btn">Edit Task</button>
+        {% endif %}
     </div>
 </div>
 
@@ -18,6 +20,16 @@
         <label>Equipment</label>
         <p style="margin-top: 0;"><a href="{% url 'equipment_detail' task.equipment.pk %}"
                 style="color: var(--text-primary);">{{ task.equipment.name }}</a></p>
+
+
+        <label>Assigned User</label>
+        <p style="margin-top: 0;">
+            {% if task.assignee %}
+                {{ task.assignee.get_full_name|default:task.assignee.username }}
+            {% else %}
+                <span class="text-secondary">Unassigned</span>
+            {% endif %}
+        </p>
 
         <label>Due Date</label>
         <p style="margin-top: 0;">{{ task.due_date|default:"No due date" }}</p>

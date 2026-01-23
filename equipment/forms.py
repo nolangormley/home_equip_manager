@@ -13,7 +13,7 @@ class EquipmentForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'status', 'due_date']
+        fields = ['title', 'description', 'status', 'due_date', 'recurrence', 'assignee']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Optional details...'}),
@@ -22,7 +22,7 @@ class TaskForm(forms.ModelForm):
 class TaskEditForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date', 'status', 'equipment', 'completed']
+        fields = ['title', 'description', 'due_date', 'status', 'equipment', 'completed', 'recurrence', 'assignee']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 4}),

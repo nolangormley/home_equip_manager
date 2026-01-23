@@ -23,6 +23,7 @@ class Equipment(models.Model):
         return self.name
 
 class Task(models.Model):
+    assignee = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tasks', help_text='User assigned to this task')
     STATUS_CHOICES = [
         ('icebox', 'Icebox'),
         ('todo', 'To Do'),
@@ -38,6 +39,18 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    # Recurrence fields
+    RECURRENCE_CHOICES = [
+        (None, 'Does not repeat'),
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    ]
+    recurrence = models.CharField(max_length=10, choices=RECURRENCE_CHOICES, blank=True, null=True, default=None)
+    next_due_date = models.DateField(blank=True, null=True, help_text="Next due date for recurring tasks")
 
     def __str__(self):
         return f"{self.title} - {self.equipment.name}"
